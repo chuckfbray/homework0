@@ -1,0 +1,129 @@
+---
+title: "hw0"
+author-title: "Charles Bray"
+date: "9-1-2023"
+format: html
+title-block-banner: true
+editor: visual
+---
+
+## Part 0: Description of Quarto document
+Part I computes solutions to the equation f(x)=ax^2+bx+c=0, where arguments a, b, and c are user-defined, hard-coded values, while Part II displays the function and its solutions graphically.
+
+## Part I: Solutions to the quadratic equation
+
+```{r}
+#| label: fcn-define
+#| warning: false
+#| error: false
+#| echo: false
+#| code-line-numbers: false
+#| results: asis
+
+# load libraries
+library(ggplot2)
+
+# define the equation solver function
+fx <- function(a,b,c){
+  if(is.nan((-b+sqrt(b^2-4*a*c))/(2*a))==FALSE){
+    if((-b+sqrt(b^2-4*a*c))/(2*a)==(-b-sqrt(b^2-4*a*c))/(2*a)){
+      cat(paste0("One (1) distinct solution: ",
+             (-b+sqrt(b^2-4*a*c))/(2*a)))
+      solnlist <- (-b+sqrt(b^2-4*a*c))/(2*a)
+    } else{
+      cat(paste0("Two (2) distinct solutions: ",
+            (-b+sqrt(b^2-4*a*c))/(2*a), ", ",
+            (-b-sqrt(b^2-4*a*c))/(2*a)))
+      solnlist <- c((-b+sqrt(b^2-4*a*c))/(2*a), (-b-sqrt(b^2-4*a*c))/(2*a))
+    }
+  } else{
+    cat("No solutions.")
+    solnlist <- NaN
+  } 
+  
+  return (solnlist)
+}
+
+# hard-code the arguments to pass into the function
+# FEEL FREE TO CHANGE THESE!
+aa = 1
+bb = 3
+cc = 2
+
+solnlist<-fx(aa,bb,cc)
+
+```
+
+## Part II: Visualization of solutions
+
+```{r}
+#| label: viz
+#| warning: false
+#| error: false
+#| echo: false
+#| code-line-numbers: false
+#| results: asis
+
+# generate solution list using function defined above
+if(!is.nan(solnlist)){
+  maxsoln = max(solnlist)
+  minsoln = min(solnlist)
+} else{
+  maxsoln = 10
+  minsoln = -10
+}
+rangesoln = maxsoln - minsoln
+minrange = minsoln-rangesoln
+maxrange = maxsoln+rangesoln
+
+
+#Generate the independent variable to graph
+x=c(minrange:maxrange)
+
+
+#Generate the dependent variable to graph
+y=aa*x^2+bb*x+cc
+maxy = max(y)
+miny = min(y)
+rangey = maxy - miny
+if(rangey==0){
+  minrangey = miny - 1
+  maxrangey = maxy + 1
+} else{
+  minrangey = miny-rangey
+  maxrangey = maxy+rangey
+}
+
+
+#plot dataframe
+df <- data.frame(x,y)
+if(!is.nan(solnlist)){
+  ggplot(df, aes(x=x,y=y)) +
+    geom_hline(yintercept=0, color="grey") +
+    geom_line() +
+    geom_vline(xintercept = solnlist, color="maroon", linetype = "dashed") +
+    annotate("label", label = "x-intercept",
+      x = solnlist, y = c(rep(0.5*max(y), length(solnlist))),
+      size = 3, color = "maroon") +
+    ylim(c(minrangey,maxrangey)) +
+    theme_bw() +
+    theme(plot.caption = element_text(hjust=0)) +
+    labs(title=paste0("Plotted values of f(x)=",aa,"x^2+",bb,"x+",cc," and solutions to f(x)=0."),
+         caption="Notes:\n[1] Plotted values of f(x)=ax^2+bx+c, where a, b, and c are user-defined.\n[2] Dashed red line(s) indicate x-intercept, when a solution to ax^2+bx+c=0 exists.")
+} else{
+    ggplot(df, aes(x=x,y=y)) +
+    geom_hline(yintercept=0, color="grey") +
+    geom_line() +
+    geom_vline(xintercept = solnlist, color="maroon", linetype = "dashed") +
+    annotate("label", label = "no x-intercept exists",
+      x = 0, y = max(y) + 1,
+      size = 3, color = "maroon") +
+    ylim(c(minrangey,maxrangey)) +
+    theme_bw() +
+    theme(plot.caption = element_text(hjust=0)) +
+    labs(title=paste0("Plotted values of f(x)=",aa,"x^2+",bb,"x+",cc," and solutions to f(x)=0."),
+         caption="Notes:\n[1] Plotted values of f(x)=ax^2+bx+c, where a, b, and c are user-defined.\n[2] Dashed red line(s) indicate x-intercept, when a solution to ax^2+bx+c=0 exists.")
+}
+
+```
+
